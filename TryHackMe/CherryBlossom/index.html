@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <title>CherryBlossom</title>
+    
+    <style>
+        .hide {
+            display: none;
+        }
+        .code {
+            color: #fff !important;
+            background-color: #6c757d;
+            padding: 1em;
+            border: 1px dashed black;
+        }
+        h2 {
+            padding-top: 3em;
+        }
+    </style>
+  </head>
+  <body>
+       <div class = "container">
+           <h1>CherryBlossom Nudgethrough</h1>
+<p>Welcome to my nudgethrough of CherryBlossom.  </p>
+<p>Unlike a walkthrough, a nudgethrough attempts to point you in the right direction for the next step.  It will eventually show you how to solve the problem, but first it will give you some pointers so hopefully you can find the answer first.  A nudgethrough will also try and point out deadends, so you don't drop too deep into rabbit holes.</p>
+<p>CherryBlossom is another impessively done Try Hack Me room by MuirlandOracle.  </p>
+<p>It's got a bunch of Stego which I normally dislike, but there was less flailing around in this room than in many steg challenges.</p>
+<p>At the end it's got a very specific but very neat trick.  I probably wouldn't have found the final trick on my own and had to look it up.  Hopefully I can nudge you there rather than just telling you the answer.</p>
+    
+    
+            
+                    <h2>Finding the Journal Flag</h2>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Enumerate.  Find the ports that are open.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Ports 22, 139, 445</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>139 &amp; 445 are samba, whats in there?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>smbclient -NL $IP
+</code></pre>
+<p>this will list the samba shares</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>smbclient \\\\$IP\\Anonymous
+</code></pre>
+<p>this will connect to the anonymous share</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Journal.txt is base64, what does the data look like after decoding?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Looking at the first few bytes, it's probably a png</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>cat journal.txt | base64 -d &gt; journal.png
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>The THM hint points to a stego docker image.  Try some stego stuff on this image.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>docker run -it --rm -v $(pwd):/data dominicbreuker/stego-toolkit /bin/bash
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Try some tools against the png</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>zsteg is a deadend</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>stegpy  (I hate stego, you have to get lucky and try the exact tool they used)</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>stegpy journal.png
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>The zip is corrupted.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>It's not a jpeg, contrary to what the file command says</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>try strings on it</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>notice the PK and filename at the end?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>it is a zip, but it's been manipulated</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>first things first, lets fix the magic bytes</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Change the first 4 bytes to 50 4B 03 04</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>That's all it took.  Now it wants a password.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>This is our only lead so far, perhaps we're to crack it?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>zip2john _journal.zip &gt; hash4john
+john --wordlist=../../tools/rockyou.txt hash4john
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>What's Journal.ctz?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>use 7zip to open it:   7z e Journal.ctz</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>It needs another password, we know what to do</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>/usr/share/john/7z2john.pl Journal.ctz &gt; hash4john
+john --wordlist=../../tools/rockyou.txt hash4john
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>What is Journal.ctd?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>In the first few entries J picks a password</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Whats the girlfriends name?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Lilly</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Also there's the first flag in here.</p>
+                        </div>
+                    </div>
+                
+            
+                    <h2>Finding the User Flag</h2>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Extract all the files and base64 decode them.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Time for ssh.  We don't know j's username, but we do know his girlfriends.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>We know she picked off his new list.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>hydra -l lily -P cherry-blossom.list ssh://$IP
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>You should get her password after about 7min or so.  Somewhere in the first 500 lines or so.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Mr.$un$hin3</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>We're in.  Time to enumerate.  I've also got a script that I run on a THM box once I have ssh, it pushes some scripts and my ssh key.  You may want something similar to avoid having to type that password all the time.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Usually I poke around in the home folder a bit, run sudo -l, then run linpeas</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>notice anything odd about sudo -l?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>lily can't run sudo, this is odd. Remember this, but for now move on.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Who are the user accounts on the system?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>johan, lily, root</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>We're looking for files this time, not exploits.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Backup files</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>/var/backups</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>scp lily@$IP:/var/backups/shadow.bak .
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Lets try to see if Johan's or root's passwords are in his list.  Should be faster to check the shadow file than via ssh</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>scp lily@$IP:/etc/passwd .
+unshadow passwd shadow.bak  &gt; passwords.txt
+john --wordlist=cherry-blossom.list passwords.txt
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>That should give Johan's and Lily's passwords.  We already had lily's but it's nice to see confirmation.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>##scuffleboo##
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Looks like we can't ssh into johan.  Probably want us to not crack his password via ssh.  Need to find another way to get into johan's account.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>ssh lily@$IP
+su johan
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>find the user flag</p>
+                        </div>
+                    </div>
+                
+            
+                    <h2>Find the Root Flag</h2>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>NOTE: This next step is much more esoteric than the previous ones.   This is not low hanging fruit.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Enumerate.  Same as before, poke around the home folder, run sudo -l, run linpeas</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>johan can run sudo when lily couldn't.  </p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>This is a THM box, a configuration like that likely isn't a coincidence.  </p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Normally lily just wouldn't be listed in the sudoers file.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Why would the box dev want to stop lily from even running sudo?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Perhaps there's a problem with the sudo on this machine?</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Try googling that version of sudo</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>I found this web site https://www.cybersecurity-help.cz (I have no idea how safe or reliable this site is, it's just a google result.)</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>In the next hint I'll tell you specifially which vunerablity.  You may want to poke around a bit, try some things.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>CVE-2019-18634</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>You can go read on this exploit, but basically it works on the way this version of sudo would replace your password with stars as you type.<br />
+By typing a long password, we can cause a buffer overflow.  There is proof of concept code out there.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>https://raw.githubusercontent.com/saleemrashid/sudo-cve-2019-18634/master/exploit.c</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>The machine doesn't have gcc, we will need to compile it elsewhere and upload.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <pre><code>gcc -o exploit exploit.c
+scp exploit lily@$IP:
+ssh lily@$IP
+su johan
+cd ~
+cp /home/lily/exploit .
+./exploit
+</code></pre>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>This should give you root access.</p>
+                        </div>
+                    </div>
+                
+            
+                    <div class="card spoiler">
+                        <div class="card-header">Nudge</div>
+                        <div class="card-body hide">
+                            <p>Grab the root flag.  Congrats!</p>
+                        </div>
+                    </div>
+                
+            
+        </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script>
+        $('.spoiler').click(function() {
+            $(this).find('.hide').slideToggle();
+        })
+        $('pre:has(code)').addClass('code');
+    </script>
+  </body>
+</html>
